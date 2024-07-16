@@ -1,0 +1,13 @@
+{
+  "@teqfw/core": {
+    "devMode": true
+  },
+  "@teqfw/web": {
+    "server": {
+      "port": 8082,
+      "useHttp1": true,
+      "useWebSocket": false
+    },
+    "urlBase": "localhost"
+  }
+}

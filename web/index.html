@@ -2,9 +2,85 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <title>Loyalty Card Wallet</title>
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            // VARS
+            // const urlSw = 'sw.js';
+            const urlSw = null;
+            const nsApp = 'Wallet_Front_App';
+            const cssApp = '#app';
+            const elLog = document.getElementById('boot-log');
+
+            // FUNCS
+            function fnFinalize() {
+                // remove the bootstrap element
+                const el = document.getElementById('boot');
+                if (typeof el?.remove === 'function') el.remove();
+            }
+
+            function fnLog(msg) {
+                // logs errors to UI, console and logs aggregator
+                elLog.innerHTML = msg;
+                console.log(`[app-shell]: ${msg}`);
+                // navigator.sendBeacon('https://console.wiredgeese.com/log/lollypals', msg);
+            }
+
+            function fnProgress(percent) {
+                // elProgress.innerHTML = percent;
+                console.log(`[app-shell]: ${percent}%`);
+            }
+
+            async function cleanCache() {
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    cacheNames.forEach(cacheName => caches.delete(cacheName));
+                    fnLog(`The cache storage is cleaned.`);
+                } else fnLog(`The cache storage is not available here.`);
+                window.location.reload();
+            }
+
+            function cleanUp() {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (const registration of registrations) registration.unregister();
+                });
+                if ('caches' in window) {
+                    caches.keys().then(cacheNames => {
+                        cacheNames.forEach(cacheName => caches.delete(cacheName));
+                    });
+                }
+                localStorage.clear();
+                window.location.reload();
+            }
+
+            // MAIN
+            try {
+                const elBtnCache = document.getElementById('boot-cache');
+                elBtnCache?.addEventListener('click', cleanCache);
+                const elBtnReInst = document.getElementById('boot-reinstall');
+                elBtnReInst?.addEventListener('click', cleanUp);
+                const {bootstrap} = await import('./web/@teqfw/web/js/bootstrap.mjs');
+                bootstrap(fnLog, fnProgress, urlSw, nsApp, cssApp, fnFinalize).catch(console.error);
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    </script>
 </head>
 <body>
-<div>Hello, guys!</div>
+<div id="boot">
+    <div id="boot-log"></div>
+</div>
+<div id="app"></div>
+<!-- load styles and fonts -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quasar@2.16.6/dist/quasar.prod.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!-- overwrite all other styles -->
+<link rel="stylesheet" href="./styles.css">
+<!-- UMD sources for external libs -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3.4.31/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-router@4.4.0/dist/vue-router.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quasar@2.16.6/dist/quasar.umd.prod.js"></script>
 </body>
 </html>

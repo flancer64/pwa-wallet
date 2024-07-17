@@ -48,7 +48,10 @@ export default function (
      * @memberOf Wallet_Front_Ui_Route_Card_Add
      */
     return {
-        teq: {package: DEF.SHARED.NAME},
+        teq: {
+            package: DEF.SHARED.NAME,
+            scanner: undefined,
+        },
         name: NS,
         template,
         components: {},
@@ -76,11 +79,19 @@ export default function (
             // MAIN
             wgTitle.setTitle('Add');
 
-            let html5QrcodeScanner = new Html5QrcodeScanner(
+            this.$options.teq.scanner = new Html5QrcodeScanner(
                 'reader',
-                {fps: 5, qrbox: {width: 250, height: 250}},
+                {
+                    fps: 4, // scan rate is 4 frames per second
+                    qrbox: {width: 250, height: 250}
+                },
                 /* verbose= */ false);
-            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            this.$options.teq.scanner.render(onScanSuccess, onScanFailure);
+        },
+        unmounted() {
+            if (this.$options.teq.scanner?.clear) {
+                this.$options.teq.scanner.clear();
+            }
         },
     };
 }

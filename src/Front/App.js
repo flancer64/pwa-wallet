@@ -86,10 +86,6 @@ export default class Wallet_Front_App {
              * @param {Wallet_Front_Defaults} DEF
              */
             function initRouter(app, DEF) {
-                // VARS
-                const META_ANON = 'anonymous';
-
-                // MAIN
                 /** @type {{addRoute, beforeEach}} */
                 const router = VueRouter.createRouter({
                     history: VueRouter.createWebHashHistory(),
@@ -97,18 +93,18 @@ export default class Wallet_Front_App {
                 });
                 // setup application routes (load es6-module on demand using DI-container)
                 router.addRoute({
+                    path: DEF.ROUTE_CARD_ADD,
+                    component: lazyRoute('Wallet_Front_Ui_Route_Card_Add'),
+                });
+                router.addRoute({
                     path: DEF.ROUTE_HOME,
                     component: lazyRoute('Wallet_Front_Ui_Route_Home'),
-                    meta: {[META_ANON]: true},
                 });
                 // Catch-all route for 404
                 router.addRoute({
                     path: '/:pathMatch(.*)*',
                     component: lazyRoute('Wallet_Front_Ui_Route_NotFound'),
-                    meta: {[META_ANON]: true},
                 });
-                //
-                // router.beforeEach((to) => {   });
                 //
                 app.use(router);
             }

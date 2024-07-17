@@ -68,6 +68,10 @@ export default function (
                         label: 'Home',
                         route: DEF.ROUTE_HOME,
                     }, {
+                        icon: 'add',
+                        label: 'Add',
+                        route: DEF.ROUTE_CARD_ADD,
+                    }, {
                         icon: 'settings',
                         label: 'Settings',
                         route: DEF.ROUTE_SETTINGS,

@@ -1,5 +1,5 @@
 /**
- * The screen for 'Not Found' route.
+ * The Vue component for 'Not Found' route.
  *
  * @namespace Wallet_Front_Ui_Route_NotFound
  */

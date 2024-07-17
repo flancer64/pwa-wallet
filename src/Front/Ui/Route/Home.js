@@ -1,5 +1,5 @@
 /**
- * The base screen for the application's homepage.
+ * The Vue component for home route.
  *
  * @namespace Wallet_Front_Ui_Route_Home
  */

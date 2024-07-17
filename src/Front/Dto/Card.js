@@ -13,6 +13,7 @@ const ATTR = {
     CODE_TYPE: 'codeType',
     COLOR: 'color',
     DATE_CREATED: 'dateCreated',
+    DATE_LAST: 'dateLast',
     DESC: 'desc',
     NAME: 'name',
     UUID: 'uuid',
@@ -101,6 +102,9 @@ export default class Wallet_Front_Dto_Card {
             return res;
         };
 
+        /**
+         * @return {typeof Wallet_Front_Dto_Card.ATTR}
+         */
         this.getAttributes = () => ATTR;
     }
 

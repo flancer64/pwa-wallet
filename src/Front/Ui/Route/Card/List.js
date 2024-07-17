@@ -12,20 +12,24 @@ const NS = 'Wallet_Front_Ui_Route_Card_List';
  * TeqFW DI factory function to get dependencies for the object.
  *
  * @param {Wallet_Front_Defaults} DEF
+ * @param {TeqFw_Web_Front_App_Store_IDB} idb
+ * @param {Wallet_Front_Store_IDb_Store_Card} idbCard
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  * @param {Wallet_Front_Ui_Route_Card_List_A_Item.vueCompTmpl} uiItem
  * @param {Wallet_Front_Dto_Card} dtoCard
- * @param {typeof Wallet_Front_Enum_Code_Type} TYPE
+ *
  *
  * @returns {Wallet_Front_Ui_Route_Card_List.vueCompTmpl}
  */
 export default function (
     {
         Wallet_Front_Defaults$: DEF,
+        Wallet_Front_Store_IDb_Provider$: idb,
+        Wallet_Front_Store_IDb_Store_Card$: idbCard,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
         Wallet_Front_Ui_Route_Card_List_A_Item$: uiItem,
         Wallet_Front_Dto_Card$: dtoCard,
-        Wallet_Front_Enum_Code_Type$: TYPE,
+
     }
 ) {
     // VARS
@@ -34,22 +38,9 @@ export default function (
     <div class="q-pa-lg q-gutter-sm">
         <ui-item v-for="one of items" :item="one"/> 
     </div> 
+    <ui-spinner :loading="ifLoading"/>
 </layout-main>
 `;
-    const items = [
-        {
-            code: 'D01665588618060',
-            codeType: TYPE.CODE_128,
-            color: 'FF0000',
-            name: 'Maxima',
-            uuid: '123456-12312312312-1'
-        },
-        {code: '23456', codeType: TYPE.CODE_128, color: 'FFFF00', name: 'second', uuid: '123456-12312312312-2'},
-        {code: '6346346', codeType: TYPE.CODE_128, color: '00FF00', name: 'third', uuid: '123456-12312312312-3'},
-        {code: '12368888', codeType: TYPE.CODE_128, color: '00FFFF', name: 'forth', uuid: '123456-12312312312-4'},
-        {code: '97567573', codeType: TYPE.CODE_128, color: '0000FF', name: 'fifth', uuid: '123456-12312312312-5'},
-    ];
-
     // FUNCS
 
     // MAIN
@@ -68,13 +59,26 @@ export default function (
         components: {uiItem},
         data() {
             return {
-                items,
+                ifLoading: false,
+                items: [],
             };
         },
         computed: {},
         methods: {},
         async mounted() {
             wgTitle.setTitle('My Cards');
+            this.ifLoading = true;
+            const trx = await idb.startTransaction([idbCard]);
+            const res = await idb.readSet(trx, idbCard);
+            await trx.commit();
+            this.items.length = 0;
+            if (res.length) {
+                res.sort((a, b) => {
+                    return (a?.dateLast < b?.dateLast) ? -1 : 1;
+                });
+                this.items.push(...res);
+            }
+            this.ifLoading = false;
         },
     };
 }

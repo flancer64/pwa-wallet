@@ -30,7 +30,7 @@ export default function (
     // VARS
     const template = `
 <layout-main>
-    <div class="q-pa-lg q-gutter-sm">
+    <div class="q-pa-sm q-gutter-sm">
         <ui-item v-for="one of items" :item="one"/> 
     </div> 
     <ui-spinner :loading="ifLoading"/>

@@ -13,6 +13,7 @@ const NS = 'Wallet_Front_Ui_Route_Card_Use';
  *
  * @param {Wallet_Front_Defaults} DEF
  * @param {Wallet_Front_Util_Format} format
+ * @param {Wallet_Front_Util_CodeType} codeType
  * @param {Wallet_Front_Mod_Card} modCard
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  *
@@ -22,6 +23,7 @@ export default function (
     {
         Wallet_Front_Defaults$: DEF,
         Wallet_Front_Util_Format$: format,
+        Wallet_Front_Util_CodeType$: codeType,
         Wallet_Front_Mod_Card$: modCard,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
     }
@@ -38,11 +40,11 @@ export default function (
         </q-card>
         <q-card v-if="!ifNotFound">
             <q-card-section>
-                <div>{{item?.name}}</div>
-                <div>{{item?.code}}</div>
-                <div>{{item?.codeType}}</div>
-                <div>{{uiDateLast}}</div>
-                <canvas ref="barcodeCanvas"></canvas>
+                <div class="row justify-between">
+                    <div class="text-caption">{{item?.codeType}}</div>
+                    <div>{{uiDateCreated}}</div>
+                </div> 
+                <div class="text-h6">{{item?.name}}</div>
                 <span v-html="svg"></span>
             </q-card-section>
         </q-card>
@@ -79,15 +81,14 @@ export default function (
             uuid: String,
         },
         computed: {
-            uiDateLast() {
-                return (this.item?.dateLast) ? format.date(this.item.dateLast, false) : '';
+            uiDateCreated() {
+                return format.date(this.item.dateCreated);
             },
         },
         methods: {
             generateBarcode() {
                 const code = this.item.code;
-                // const type = this.item.codeType;
-                const type = 'code128';
+                const type = codeType.toBwipjs(this.item.codeType);
                 if (!code || !type) return;
 
                 this.svg = bwipjs.toSVG({

@@ -8,6 +8,7 @@ export default class Wallet_Front_App {
      * @param {TeqFw_Di_Api_Container} container
      * @param {Wallet_Front_Defaults} DEF
      * @param {TeqFw_Core_Shared_Logger_Base} loggerBase
+     * @param {TeqFw_Core_Shared_Api_Logger_Transport} loggerTransport
      * @param {TeqFw_Web_Front_Mod_Config} modCfg
      * @param {Wallet_Front_Ui_Layout_Main.vueCompTmpl} layoutMain
      * @param {Wallet_Front_Ui_Main.vueCompTmpl} uiMain
@@ -18,6 +19,7 @@ export default class Wallet_Front_App {
             container,
             Wallet_Front_Defaults$: DEF,
             TeqFw_Core_Shared_Logger_Base$: loggerBase,
+            TeqFw_Core_Shared_Api_Logger_Transport$: loggerTransport,
             TeqFw_Web_Front_Mod_Config$: modCfg,
             Wallet_Front_Ui_Layout_Main$: layoutMain,
             Wallet_Front_Ui_Main$: uiMain,
@@ -53,6 +55,10 @@ export default class Wallet_Front_App {
              */
             function createPrintout(fn) {
                 return (typeof fn === 'function') ? fn : (msg) => console.log(msg);
+            }
+
+            function initLogger() {
+                loggerBase.setTransport(loggerTransport);
             }
 
             /**
@@ -130,8 +136,10 @@ export default class Wallet_Front_App {
                 initQuasarUi(_app, Quasar);
                 _print(`Quasar UI is initialized. Loading the front app configuration...`);
                 await modCfg.init();
-                _print(`The app config is loaded. Initializing the Vue Router...`);
-                initRouter(_app, DEF, container);
+                _print(`The app config is loaded. Initializing the logger...`);
+                initLogger();
+                _print(`The logger is initialized. Initializing the Vue Router...`);
+                initRouter(_app, DEF);
                 _print(`The Vue Router is initialized. The front app initialization is complete.`);
                 res = true;
             } catch (e) {

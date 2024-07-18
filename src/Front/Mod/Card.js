@@ -25,6 +25,21 @@ export default class Wallet_Front_Mod_Card {
 
         /**
          * Read all cards from IDB.
+         * @param {Wallet_Front_Dto_Card.Dto} dto
+         * @returns {Promise<Wallet_Front_Dto_Card.Dto>}
+         */
+        this.create = async function (dto) {
+            const trx = await idb.startTransaction([idbCard]);
+            dto.dateCreated = new Date();
+            dto.uuid = self.crypto.randomUUID();
+            const key = await idb.create(trx, idbCard, dto);
+            const res = await idb.readOne(trx, idbCard, key);
+            await trx.commit();
+            return res;
+        };
+
+        /**
+         * Read all cards from IDB.
          * @returns {Promise<Wallet_Front_Dto_Card.Dto[]>}
          */
         this.readList = async function () {

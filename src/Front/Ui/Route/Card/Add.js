@@ -1,10 +1,14 @@
 /**
  * The Vue component for route to add a new card.
  *
+ * We can use `html5-qrcode` or `@ericblade/quagga2` package. The first one is more simple but does not support i18n.
+ * So, for the moment the `html5-qrcode` is used.
+ *
  * @namespace Wallet_Front_Ui_Route_Card_Add
  */
 // MODULE'S VARS
 const NS = 'Wallet_Front_Ui_Route_Card_Add';
+const REF_SCAN = 'scan';
 
 // MODULE'S FUNCTIONS
 
@@ -12,6 +16,9 @@ const NS = 'Wallet_Front_Ui_Route_Card_Add';
  * TeqFW DI factory function to get dependencies for the object.
  *
  * @param {Wallet_Front_Defaults} DEF
+ * @param {Wallet_Front_Mod_Notify} modNotify
+ * @param {Wallet_Front_Mod_Card} modCard
+ * @param {Wallet_Front_Ui_Route_Card_Add_A_Scan.vueCompTmpl} uiScan
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  *
  * @returns {Wallet_Front_Ui_Route_Card_Add.vueCompTmpl}
@@ -19,23 +26,56 @@ const NS = 'Wallet_Front_Ui_Route_Card_Add';
 export default function (
     {
         Wallet_Front_Defaults$: DEF,
+        Wallet_Front_Mod_Notify$: modNotify,
+        Wallet_Front_Mod_Card$: modCard,
+        Wallet_Front_Ui_Route_Card_Add_A_Scan$: uiScan,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
     }
 ) {
     // VARS
-    const Html5QrcodeScanner = self.window.Html5QrcodeScanner;
-
     const template = `
 <layout-main>
     <div class="q-pa-lg q-gutter-sm">
         <q-card>
-            <q-card-section>
-                <div>Text: {{text}}</div>
-                <div>Result: {{result}}</div>
-                <div id="reader" style="width:80vw; border: 1px solid black;"></div>
+            <q-card-section class="q-gutter-sm">
+                <div>General</div>
+                <q-input v-model="fldName"
+                         dense
+                         label="Name"
+                         outlined
+                />
+                <q-input v-model="fldDesc"
+                         autogrow
+                         dense
+                         label="Description"
+                         outlined
+                />
             </q-card-section>
+            
+            <q-card-section class="q-gutter-sm">
+                <div>Code</div>
+                <div class="row justify-between items-center">
+                    <q-input v-model="fldCode"
+                             dense
+                             label="Code"
+                             outlined
+                             readonly
+                    />
+                    <q-btn outline label="Scan" @click="onScan"/>
+                </div>
+                <q-input v-model="fldCodeType"
+                         dense
+                         label="Code Type"
+                         outlined
+                         readonly
+                />
+            </q-card-section>
+            <q-card-actions align="center">
+                <q-btn outline label="Add" @click="onAdd"/>
+            </q-card-actions>
         </q-card>
-    </div> 
+    </div>
+    <ui-scan ref="${REF_SCAN}" @onOk="doScanOk"/>
 </layout-main>
 `;
     // FUNCS
@@ -54,44 +94,44 @@ export default function (
         },
         name: NS,
         template,
-        components: {},
+        components: {uiScan},
         data() {
             return {
-                result: undefined,
-                text: undefined,
+                fldCode: undefined,
+                fldCodeType: undefined,
+                fldDesc: undefined,
+                fldName: undefined,
             };
         },
         computed: {},
-        methods: {},
+        methods: {
+            doScanOk(code, codeType) {
+                this.fldCode = code;
+                this.fldCodeType = codeType;
+            },
+            async onAdd() {
+                const dto = modCard.composeEntity();
+                dto.code = String(this.fldCode);
+                dto.codeType = String(this.fldCodeType);
+                dto.name = String(this.fldName);
+                if(this.fldDesc) dto.desc = String(this.fldDesc);
+                const created = await modCard.create(dto);
+                if (created.uuid) {
+                    modNotify.positive(`New card is added to IDB.`);
+                    this.$router.push(DEF.ROUTE_CARD_LIST);
+                } else {
+                    modNotify.negative(`Cannot add new card to IDB.`);
+                }
+            },
+            onScan() {
+                /** @type {Wallet_Front_Ui_Route_Card_Add_A_Scan.IUi} */
+                const dlg = this.$refs[REF_SCAN];
+                dlg.show();
+            },
+        },
         async mounted() {
-            // FUNCS
-            const onScanFailure = (error) => {
-                // handle scan failure, usually better to ignore and keep scanning.
-                // for example:
-                console.warn(`Code scan error = ${error}`);
-            };
-            const onScanSuccess = (decodedText, decodedResult) => {
-                // handle the scanned code as you like, for example:
-                console.log(`Code matched = ${decodedText}`, decodedResult);
-                this.text = decodedText;
-                this.result = decodedResult;
-            };
-            // MAIN
-            wgTitle.setTitle('Add');
-
-            this.$options.teq.scanner = new Html5QrcodeScanner(
-                'reader',
-                {
-                    fps: 4, // scan rate is 4 frames per second
-                    qrbox: {width: 250, height: 250}
-                },
-                /* verbose= */ false);
-            this.$options.teq.scanner.render(onScanSuccess, onScanFailure);
+            wgTitle.setTitle('Add a new card');
         },
-        unmounted() {
-            if (this.$options.teq.scanner?.clear) {
-                this.$options.teq.scanner.clear();
-            }
-        },
+        unmounted() {},
     };
 }

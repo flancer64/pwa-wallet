@@ -13,8 +13,6 @@ const NS = 'Wallet_Front_Ui_Route_Card_List_A_Item';
  *
  * @param {Wallet_Front_Defaults} DEF
  * @param {Wallet_Front_Util_Format} format
- * @param {Wallet_Front_Dto_Card} dtoCard
- * @param {typeof Wallet_Front_Enum_Code_Type} TYPE
  *
  * @returns {Wallet_Front_Ui_Route_Card_List_A_Item.vueCompTmpl}
  */
@@ -22,8 +20,6 @@ export default function (
     {
         Wallet_Front_Defaults$: DEF,
         Wallet_Front_Util_Format$: format,
-        Wallet_Front_Dto_Card$: dtoCard,
-        Wallet_Front_Enum_Code_Type$: TYPE,
     }
 ) {
     // VARS
@@ -38,7 +34,7 @@ export default function (
                 <div class="text-h6">{{item?.name}}</div>
                 <div>{{uiDateLast}}</div>     
             </div>
-            <div>{{item?.desc}}</div>
+            <div v-if="item?.desc">{{item?.desc}}</div>
         </div>
     </q-card-section>
 </q-card>

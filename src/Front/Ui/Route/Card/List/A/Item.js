@@ -12,6 +12,7 @@ const NS = 'Wallet_Front_Ui_Route_Card_List_A_Item';
  * TeqFW DI factory function to get dependencies for the object.
  *
  * @param {Wallet_Front_Defaults} DEF
+ * @param {Wallet_Front_Util_Format} format
  * @param {Wallet_Front_Dto_Card} dtoCard
  * @param {typeof Wallet_Front_Enum_Code_Type} TYPE
  *
@@ -20,13 +21,14 @@ const NS = 'Wallet_Front_Ui_Route_Card_List_A_Item';
 export default function (
     {
         Wallet_Front_Defaults$: DEF,
+        Wallet_Front_Util_Format$: format,
         Wallet_Front_Dto_Card$: dtoCard,
         Wallet_Front_Enum_Code_Type$: TYPE,
     }
 ) {
     // VARS
     const template = `
-<q-card>
+<q-card @click="onClick">
     <q-card-section class="row q-gutter-xs" :style="uiStyle">
         <div style="width: 18%">
              <q-avatar color="primary" text-color="white">{{uiAvatarLetter}}</q-avatar>
@@ -70,14 +72,20 @@ export default function (
                 return this.item?.name?.[0]?.toUpperCase() ?? '?';
             },
             uiDateLast() {
-                return '24/07/17';
+                return (this.item?.dateLast) ? format.date(this.item.dateLast) : '';
             },
             uiStyle() {
                 const color = this.item?.color ?? 'FFFFFF';
                 return `background: #${color}`;
             },
         },
-        methods: {},
+        methods: {
+            onClick() {
+                const path = DEF.ROUTE_CARD_USE_X
+                    .replace(':uuid', this.item.uuid);
+                this.$router.push(path);
+            },
+        },
         async mounted() { },
     };
 }

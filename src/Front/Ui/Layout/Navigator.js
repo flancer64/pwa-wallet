@@ -41,7 +41,7 @@ export default function (
 
     </q-list>
     
-    <div class="text-right text-caption q-pr-xs q-pt-xl">
+    <div class="text-right text-caption q-pr-xs q-pt-xl" style="padding-right: 10px;">
         version: {{uiVersion}}
     </div>
    

@@ -14,6 +14,7 @@ const NS = 'Wallet_Front_Ui_Route_Card_List';
  * @param {Wallet_Front_Defaults} DEF
  * @param {TeqFw_Web_Front_App_Store_IDB} idb
  * @param {Wallet_Front_Store_IDb_Store_Card} idbCard
+ * @param {Wallet_Front_Mod_Card} modCard
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  * @param {Wallet_Front_Ui_Route_Card_List_A_Item.vueCompTmpl} uiItem
  * @param {Wallet_Front_Dto_Card} dtoCard
@@ -26,6 +27,7 @@ export default function (
         Wallet_Front_Defaults$: DEF,
         Wallet_Front_Store_IDb_Provider$: idb,
         Wallet_Front_Store_IDb_Store_Card$: idbCard,
+        Wallet_Front_Mod_Card$: modCard,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
         Wallet_Front_Ui_Route_Card_List_A_Item$: uiItem,
         Wallet_Front_Dto_Card$: dtoCard,
@@ -68,9 +70,7 @@ export default function (
         async mounted() {
             wgTitle.setTitle('My Cards');
             this.ifLoading = true;
-            const trx = await idb.startTransaction([idbCard]);
-            const res = await idb.readSet(trx, idbCard);
-            await trx.commit();
+            const res = await modCard.readList();
             this.items.length = 0;
             if (res.length) {
                 res.sort((a, b) => {

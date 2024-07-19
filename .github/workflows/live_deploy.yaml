@@ -1,0 +1,90 @@
+name: LIVE deploy
+
+# start action manually
+on: workflow_dispatch
+
+env:
+  PATH_ROOT: /home/live/inst/wg # the root path to place the ZIPs and apps
+  PRJ: wallet # the folder for the project root
+  SERVICE: pwa-wallet-live.service # the name of the service to restart
+  USER: live # the user to connect with `secrets.SSH_KEY`
+  ZIP: wallet.zip # the name of the ZIP file to store the built project
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check-out repo.
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key to access the GitHub private repositories.
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Build application.
+        run: |
+          ./bin/deploy/live.sh
+
+      - name: Add application files to archive.
+        uses: montudor/action-zip@v1
+        with:
+          args: zip -qq --exclude=*.git* -r ${{env.ZIP}} ./
+
+      - name: Validate archive existence and remote host params.
+        run: |
+          ls -lh ${{env.ZIP}}
+          echo "remote host: ${{ secrets.SSH_HOST }}"
+          echo "remote user: ${{env.USER}}"
+
+      - name: Validate SSH connection.
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ env.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            pwd
+
+      - name: Copy files to Remote Server.
+        uses: easingthemes/ssh-deploy@v2.0.7
+        env:
+          ARGS: "-rlgoDzvc -i"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: "${{env.USER}}"
+          SOURCE: "${{env.ZIP}}"
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          TARGET: "${{env.PATH_ROOT}}/"
+          SCRIPT_BEFORE: |
+            whoami
+            ls -al
+          SCRIPT_AFTER: |
+            whoami
+            ls -al
+            echo $RSYNC_STDOUT          
+
+      - name: Extract files on Remote Server and switch site to the new instance.
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ env.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd "${{env.PATH_ROOT}}/"
+            TIMESTAMP=$(date +"%Y%m%d.%H%M%S")
+            cp ${{env.ZIP}} "${{env.ZIP}}-${TIMESTAMP}"
+            rm -fr ${{env.PRJ}}.old/  
+            mkdir ${{env.PRJ}}.new
+            unzip ${{env.ZIP}} -d ./${{env.PRJ}}.new/ &> /dev/null
+            cp ./${{env.PRJ}}/cfg/local.* ./${{env.PRJ}}.new/cfg/
+            sudo systemctl stop ${{ env.SERVICE }}
+            mv ./${{env.PRJ}} ./${{env.PRJ}}.old
+            mv ./${{env.PRJ}}.new ./${{env.PRJ}}
+            cd "./${{env.PRJ}}/"
+            #            npm run db-export
+            #            npm run db-init
+            #            npm run db-import
+            cd ..
+            sudo systemctl start ${{ env.SERVICE }}
+            ls -lh ./${{env.PRJ}}/

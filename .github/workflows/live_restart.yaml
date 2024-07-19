@@ -1,0 +1,23 @@
+name: PILOT_CUST restart
+
+# start action manually
+on: workflow_dispatch
+
+env:
+  SERVICE: pwa-wallet-live.service # the name of the service to restart
+  USER: live # the user to connect with `secrets.SSH_KEY`
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Stop and start the service.
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ env.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo systemctl stop ${{ env.SERVICE }}
+            sudo systemctl start ${{ env.SERVICE }}

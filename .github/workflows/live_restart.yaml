@@ -1,4 +1,4 @@
-name: PILOT_CUST restart
+name: LIVE restart
 
 # start action manually
 on: workflow_dispatch

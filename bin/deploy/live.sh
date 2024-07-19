@@ -14,7 +14,7 @@ rm -fr "${DIR_NODE}" "${DIR_ROOT}/package-lock.json"
 
 echo "Re-install JS project."
 cd "${DIR_ROOT}" || exit 255
-npm install --omit=optional
+npm install --omit=optional --production
 
 echo ""
 echo "App deployment in 'live' mode is done."

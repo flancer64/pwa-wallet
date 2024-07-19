@@ -24,17 +24,22 @@ export default function (
 ) {
     // VARS
     const template = `
-<q-card @click="onClick">
-    <q-card-section class="row q-gutter-xs" :style="uiStyle">
-        <div style="width: 18%">
-             <q-avatar color="primary" text-color="white">{{uiAvatarLetter}}</q-avatar>
-         </div>
-         <div class="column q-gutter-xs"  style="width: 78%">
-             <div class="row q-gutter-xs justify-between">
-                <div class="text-h6">{{item?.name}}</div>
-                <div>{{uiDateLast}}</div>     
+<q-card>
+    <q-card-section class="row q-gutter-xs items-center" :style="cssColor">
+        <div class="col"  @click="onUse">
+            <q-avatar color="primary" text-color="white">{{uiAvatarLetter}}</q-avatar>
+        </div>
+        <div class="col-8 column q-gutter-xs"  @click="onUse">
+            <div class="row q-gutter-xs justify-between">
+                <div class="column q-gutter-xs">
+                    <div class="text-h6">{{item?.name}}</div>
+                    <div>{{uiDateLast}}</div>
+                </div>
             </div>
             <div v-if="item?.desc">{{item?.desc}}</div>
+        </div>
+        <div class="col">
+            <q-btn dense outline icon="edit" @click="onEdit"/>
         </div>
     </q-card-section>
 </q-card>
@@ -64,19 +69,24 @@ export default function (
             item: null,
         },
         computed: {
+            cssColor() {
+                const color = this.item?.color ?? '#FFFFFF';
+                return `background-color: ${color};`;
+            },
             uiAvatarLetter() {
                 return this.item?.name?.[0]?.toUpperCase() ?? '?';
             },
             uiDateLast() {
                 return (this.item?.dateLast) ? format.date(this.item.dateLast) : '';
             },
-            uiStyle() {
-                const color = this.item?.color ?? 'FFFFFF';
-                return `background: #${color}`;
-            },
         },
         methods: {
-            onClick() {
+            onEdit() {
+                const path = DEF.ROUTE_CARD_EDIT_X
+                    .replace(':uuid', this.item.uuid);
+                this.$router.push(path);
+            },
+            onUse() {
                 const path = DEF.ROUTE_CARD_USE_X
                     .replace(':uuid', this.item.uuid);
                 this.$router.push(path);

@@ -103,6 +103,11 @@ export default class Wallet_Front_App {
                     component: lazyRoute('Wallet_Front_Ui_Route_Card_Add'),
                 });
                 router.addRoute({
+                    path: DEF.ROUTE_CARD_EDIT_X,
+                    component: lazyRoute('Wallet_Front_Ui_Route_Card_Edit'),
+                    props: true,
+                });
+                router.addRoute({
                     path: DEF.ROUTE_CARD_LIST,
                     component: lazyRoute('Wallet_Front_Ui_Route_Card_List'),
                 });

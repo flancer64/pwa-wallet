@@ -29,6 +29,8 @@
     "@teqfw/web": "github:teqfw/web"
   },
   "devDependencies": {
-    "mocha": "latest"
+    "mocha": "latest",
+    "vue": "^3",
+    "vue-router": "^4"
   }
 }

@@ -26,11 +26,6 @@ export default function (
     const CARD_INDEX = idbCard.getIndexes();
     const CARD_NAME = idbCard.getName();
     const CARD_PK = idbCard.getPrimaryKey();
-    const TEST_ITEMS = [
-        {code: 'D01665588618060', codeType: TYPE.CODE_128, name: 'Maxima'},
-        {code: 'D01665588618060', codeType: TYPE.CODE_39, name: 'Code 39'},
-        {code: 'D01665588618060', codeType: TYPE.CODE_93, name: 'Code 93'},
-    ];
 
     // FUNCS
     /**
@@ -53,15 +48,6 @@ export default function (
             }
             const store = db.createObjectStore(CARD_NAME, {keyPath: CARD_PK[0]});
             store.createIndex(CARD_INDEX.BY_DATE_LAST, CARD_ATTRS.DATE_LAST, {unique: false});
-            // insert test data
-            for (const one of TEST_ITEMS) {
-                /** @type {Wallet_Front_Dto_Card.Dto} */
-                const dto = idbCard.createDto(one);
-                dto.dateCreated = new Date();
-                dto.uuid = self.crypto.randomUUID();
-                store.add(dto);
-            }
-
         }
     }
 

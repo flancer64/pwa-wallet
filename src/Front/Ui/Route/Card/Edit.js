@@ -1,13 +1,10 @@
 /**
- * The Vue component for route to add a new card.
+ * The Vue component for route to edit an existing card.
  *
- * We can use `html5-qrcode` or `@ericblade/quagga2` package. The first one is more simple but does not support i18n.
- * So, for the moment the `html5-qrcode` is used.
- *
- * @namespace Wallet_Front_Ui_Route_Card_Add
+ * @namespace Wallet_Front_Ui_Route_Card_Edit
  */
 // MODULE'S VARS
-const NS = 'Wallet_Front_Ui_Route_Card_Add';
+const NS = 'Wallet_Front_Ui_Route_Card_Edit';
 const REF_SCAN = 'scan';
 
 // MODULE'S FUNCTIONS
@@ -16,19 +13,19 @@ const REF_SCAN = 'scan';
  * TeqFW DI factory function to get dependencies for the object.
  *
  * @param {Wallet_Front_Defaults} DEF
+ * @param {Wallet_Front_Util_Format} format
  * @param {Wallet_Front_Mod_Notify} modNotify
  * @param {Wallet_Front_Mod_Card} modCard
- * @param {Wallet_Front_Ui_Route_Card_Add_A_Scan.vueCompTmpl} uiScan
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  *
- * @returns {Wallet_Front_Ui_Route_Card_Add.vueCompTmpl}
+ * @returns {Wallet_Front_Ui_Route_Card_Edit.vueCompTmpl}
  */
 export default function (
     {
         Wallet_Front_Defaults$: DEF,
+        Wallet_Front_Util_Format$: format,
         Wallet_Front_Mod_Notify$: modNotify,
         Wallet_Front_Mod_Card$: modCard,
-        Wallet_Front_Ui_Route_Card_Add_A_Scan$: uiScan,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
     }
 ) {
@@ -38,7 +35,6 @@ export default function (
     <div class="q-pa-lg q-gutter-sm">
         <q-card :style="cssColor">
             <q-card-section class="q-gutter-sm">
-                <div>General</div>
                 <q-input v-model="fldName"
                          dense
                          label="Name"
@@ -62,33 +58,39 @@ export default function (
                             </q-popup-proxy>
                         </q-icon>
                     </template>
-                </q-input>                
-            </q-card-section>
-            
-            <q-card-section class="q-gutter-sm">
-                <div>Code</div>
-                <div class="row justify-between items-center">
-                    <q-input v-model="fldCode"
-                             dense
-                             label="Code"
-                             outlined
-                             readonly
-                    />
-                    <q-btn outline label="Scan" @click="onScan"/>
-                </div>
+                </q-input>
+                <q-input v-model="fldCode"
+                         dense
+                         label="Code"
+                         outlined
+                         readonly
+                />
                 <q-input v-model="fldCodeType"
                          dense
                          label="Code Type"
                          outlined
                          readonly
                 />
+                <q-input v-model="uiDateCreated"
+                         dense
+                         label="Created:"
+                         outlined
+                         readonly
+                />
+                <q-input v-model="uiDateUsed"
+                         dense
+                         label="Last Used:"
+                         outlined
+                         readonly
+                />
             </q-card-section>
+
             <q-card-actions align="center">
-                <q-btn outline label="Add" @click="onAdd"/>
+                <q-btn outline label="Save" @click="onSave"/>
             </q-card-actions>
         </q-card>
     </div>
-    <ui-scan ref="${REF_SCAN}" @onOk="doScanOk"/>
+    <ui-spinner :loading="ifLoading"/>
 </layout-main>
 `;
     // FUNCS
@@ -98,7 +100,7 @@ export default function (
      * Template to create new component instances using Vue.
      *
      * @const {Object} vueCompTmpl
-     * @memberOf Wallet_Front_Ui_Route_Card_Add
+     * @memberOf Wallet_Front_Ui_Route_Card_Edit
      */
     return {
         teq: {
@@ -107,7 +109,7 @@ export default function (
         },
         name: NS,
         template,
-        components: {uiScan},
+        components: {},
         data() {
             return {
                 fldCode: undefined,
@@ -115,42 +117,67 @@ export default function (
                 fldColor: undefined,
                 fldDesc: undefined,
                 fldName: undefined,
+                ifLoading: false,
+                /** @type {Wallet_Front_Dto_Card.Dto} */
+                origin: undefined,
             };
+        },
+        props: {
+            uuid: String,
         },
         computed: {
             cssColor() {
                 const color = this.fldColor ?? '#FFFFFF';
                 return `background-color: ${color};`;
             },
+            uiDateCreated() {
+                return format.dateTime(this.origin?.dateCreated);
+            },
+            uiDateUsed() {
+                return format.dateTime(this.origin?.dateLast);
+            },
         },
         methods: {
-            doScanOk(code, codeType) {
-                this.fldCode = code;
-                this.fldCodeType = codeType;
+            async loadItem() {
+                this.ifLoading = true;
+                const found = await modCard.readOne({uuid: this.uuid});
+                if (found?.uuid) {
+                    this.ifNotFound = false;
+                    this.reset(found);
+                } else {
+                    this.ifNotFound = true;
+                }
+                this.ifLoading = false;
             },
-            async onAdd() {
-                const dto = modCard.composeEntity();
-                dto.code = String(this.fldCode);
-                dto.codeType = String(this.fldCodeType);
+            async onSave() {
+                const dto = modCard.composeEntity(this.origin);
                 dto.name = String(this.fldName);
-                if (this.fldColor) dto.desc = String(this.fldColor);
-                if(this.fldDesc) dto.desc = String(this.fldDesc);
-                const created = await modCard.create(dto);
-                if (created.uuid) {
-                    modNotify.positive(`New card is added to IDB.`);
+                if (this.fldDesc) dto.desc = String(this.fldDesc);
+                if (this.fldColor) dto.color = String(this.fldColor);
+                const updated = await modCard.updateOne(dto);
+                if (updated.uuid) {
+                    modNotify.positive(`The card has been saved to IDB.`);
                     this.$router.push(DEF.ROUTE_CARD_LIST);
                 } else {
-                    modNotify.negative(`Cannot add new card to IDB.`);
+                    modNotify.negative(`Failed to save the card to IDB.`);
                 }
             },
-            onScan() {
-                /** @type {Wallet_Front_Ui_Route_Card_Add_A_Scan.IUi} */
-                const dlg = this.$refs[REF_SCAN];
-                dlg.show();
+            /**
+             * @param {Wallet_Front_Dto_Card.Dto} [dto]
+             */
+            reset(dto) {
+                this.fldCode = dto?.code;
+                this.fldCodeType = dto?.codeType;
+                this.fldColor = dto?.color;
+                this.fldDesc = dto?.desc;
+                this.fldName = dto?.name;
+                this.ifLoading = false;
+                this.origin = dto;
             },
         },
         async mounted() {
-            wgTitle.setTitle('Add a new card');
+            wgTitle.setTitle('Edit card');
+            await this.loadItem();
         },
         unmounted() {},
     };

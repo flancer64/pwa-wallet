@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="manifest" href="./pwa.json">
     <title>Loyalty Card Wallet</title>
     <script type="module">
         document.addEventListener('DOMContentLoaded', async () => {
             // VARS
-            // const urlSw = 'sw.js';
-            const urlSw = null;
+            const urlSw = 'sw.js';
+            // const urlSw = null;
             const nsApp = 'Wallet_Front_App';
             const cssApp = '#app';
             const elLog = document.getElementById('boot-log');

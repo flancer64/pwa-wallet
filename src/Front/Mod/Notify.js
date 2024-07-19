@@ -16,7 +16,7 @@ export default class Wallet_Front_Mod_Notify {
                 timeout,
                 type,
                 actions: [
-                    {icon: 'close', round: true}
+                    {icon: 'close', round: true, color: 'white'},
                 ]
             });
         }

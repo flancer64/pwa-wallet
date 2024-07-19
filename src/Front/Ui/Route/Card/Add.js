@@ -133,7 +133,7 @@ export default function (
                 dto.code = String(this.fldCode);
                 dto.codeType = String(this.fldCodeType);
                 dto.name = String(this.fldName);
-                if (this.fldColor) dto.desc = String(this.fldColor);
+                if (this.fldColor) dto.color = String(this.fldColor);
                 if(this.fldDesc) dto.desc = String(this.fldDesc);
                 const created = await modCard.create(dto);
                 if (created.uuid) {

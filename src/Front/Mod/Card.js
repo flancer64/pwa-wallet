@@ -39,6 +39,18 @@ export default class Wallet_Front_Mod_Card {
         };
 
         /**
+         * Delete one card from IDB.
+         * @param {Wallet_Front_Dto_Card.Dto} dto
+         * @returns {Promise<boolean>}
+         */
+        this.deleteOne = async function (dto) {
+            const trx = await idb.startTransaction([idbCard]);
+            const res = await idb.deleteOne(trx, idbCard, dto.uuid);
+            await trx.commit();
+            return res;
+        };
+
+        /**
          * Read all cards from IDB.
          * @returns {Promise<Wallet_Front_Dto_Card.Dto[]>}
          */

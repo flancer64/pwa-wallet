@@ -5,7 +5,7 @@
  */
 // MODULE'S VARS
 const NS = 'Wallet_Front_Ui_Route_Card_Edit';
-const REF_SCAN = 'scan';
+const REF_YES_NO = 'yesNo';
 
 // MODULE'S FUNCTIONS
 
@@ -17,6 +17,7 @@ const REF_SCAN = 'scan';
  * @param {Wallet_Front_Mod_Notify} modNotify
  * @param {Wallet_Front_Mod_Card} modCard
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
+ * @param {Wallet_Front_Ui_Lib_Dlg_YesNo.vueCompTmpl} uiDlgYesNo
  *
  * @returns {Wallet_Front_Ui_Route_Card_Edit.vueCompTmpl}
  */
@@ -27,6 +28,7 @@ export default function (
         Wallet_Front_Mod_Notify$: modNotify,
         Wallet_Front_Mod_Card$: modCard,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
+        Wallet_Front_Ui_Lib_Dlg_YesNo$: uiDlgYesNo,
     }
 ) {
     // VARS
@@ -87,9 +89,11 @@ export default function (
 
             <q-card-actions align="center">
                 <q-btn outline label="Save" @click="onSave"/>
+                <q-btn outline label="Delete" @click="onDelete"/>
             </q-card-actions>
         </q-card>
     </div>
+    <ui-dlg-yes-no ref="${REF_YES_NO}" @onYes="doDeleteYes"/>
     <ui-spinner :loading="ifLoading"/>
 </layout-main>
 `;
@@ -109,7 +113,7 @@ export default function (
         },
         name: NS,
         template,
-        components: {},
+        components: {uiDlgYesNo},
         data() {
             return {
                 fldCode: undefined,
@@ -138,6 +142,15 @@ export default function (
             },
         },
         methods: {
+            async doDeleteYes() {
+                const deleted = await modCard.deleteOne(this.origin);
+                if (deleted) {
+                    modNotify.positive(`The card has been deleted.`);
+                    this.$router.push(DEF.ROUTE_CARD_LIST);
+                } else {
+                    modNotify.negative(`Failed to delete the card from IDB.`);
+                }
+            },
             async loadItem() {
                 this.ifLoading = true;
                 const found = await modCard.readOne({uuid: this.uuid});
@@ -148,6 +161,11 @@ export default function (
                     this.ifNotFound = true;
                 }
                 this.ifLoading = false;
+            },
+            async onDelete() {
+                /** @type {Wallet_Front_Ui_Lib_Dlg_YesNo.IUi} */
+                const dlg = this.$refs[REF_YES_NO];
+                dlg.show('Confirm delete', 'Do you want to delete this card?');
             },
             async onSave() {
                 const dto = modCard.composeEntity(this.origin);

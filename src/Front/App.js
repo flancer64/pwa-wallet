@@ -120,6 +120,10 @@ export default class Wallet_Front_App {
                     path: DEF.ROUTE_HOME,
                     component: lazyRoute('Wallet_Front_Ui_Route_Home'),
                 });
+                router.addRoute({
+                    path: DEF.ROUTE_SETTINGS,
+                    component: lazyRoute('Wallet_Front_Ui_Route_Settings'),
+                });
                 // Catch-all route for 404
                 router.addRoute({
                     path: '/:pathMatch(.*)*',

@@ -24,7 +24,7 @@ export default class Wallet_Front_Mod_Card {
         this.composeEntity = idbCard.createDto;
 
         /**
-         * Read all cards from IDB.
+         * Create a new card in IDB.
          * @param {Wallet_Front_Dto_Card.Dto} dto
          * @returns {Promise<Wallet_Front_Dto_Card.Dto>}
          */

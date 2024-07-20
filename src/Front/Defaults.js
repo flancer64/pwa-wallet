@@ -19,6 +19,7 @@ export default class Wallet_Front_Defaults {
     /** @type {Wallet_Shared_Defaults} */
     SHARED;
 
+    TIMEOUT_MAIN = 4000;
     /**
      * @param {Wallet_Shared_Defaults} SHARED
      */

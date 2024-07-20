@@ -31,12 +31,12 @@ export default function (
     const template = `
 <layout-main>
     <div class="q-pa-sm q-gutter-sm">
-        <q-list bordered class="rounded-borders">
+        <q-list bordered class="rounded-borders q-gutter-xs">
             <q-expansion-item
                     header-class="bg-primary text-white rounded-borders"
                     expand-separator
                     icon="dataset"
-                    label="Export / Import" 
+                    label="Data" 
             >
                 <q-card>
                     <q-card-section class="q-gutter-xs">
@@ -51,6 +51,23 @@ export default function (
                             <div>
                                 <input id="${DOM_ID_UPLOAD}" type="file" tabindex="-1" hidden v-on:change="onUploadSelected" />
                                 <q-btn label="OK" color="primary" v-on:click="onDataImport"/>
+                            </div>
+                        </div>
+                    </q-card-section>
+                </q-card>
+            </q-expansion-item>
+            <q-expansion-item
+                    header-class="bg-primary text-white rounded-borders"
+                    expand-separator
+                    icon="settings_applications"
+                    label="Application" 
+            >
+                <q-card>
+                    <q-card-section class="q-gutter-xs">
+                        <div class="row justify-between items-center q-gutter-xs">
+                            <div>Re-Install</div>
+                            <div>
+                                <q-btn label="OK" color="primary" v-on:click="onAppReinstall"/>
                             </div>
                         </div>
                     </q-card-section>
@@ -82,6 +99,17 @@ export default function (
         },
         computed: {},
         methods: {
+            async onAppReinstall() {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const registration of registrations)
+                    await registration.unregister();
+                const cacheNames = await caches.keys();
+                cacheNames.forEach(cacheName => caches.delete(cacheName));
+                modNotify.positive(`The cache store has been deleted.`);
+                setTimeout(() => {
+                    window.location.reload();
+                }, DEF.TIMEOUT_MAIN);
+            },
             async onDataExport() {
                 const json = await modData.export();
                 const txt = JSON.stringify(json);

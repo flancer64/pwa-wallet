@@ -13,6 +13,8 @@ const DOM_ID_UPLOAD = 'uploadFile';
  * TeqFW DI factory function to get dependencies for the object.
  *
  * @param {Wallet_Front_Defaults} DEF
+ * @param {Wallet_Front_Util_Geo} utilGeo
+ * @param {Wallet_Front_Mod_App_Config} modConfig
  * @param {Wallet_Front_Mod_Data} modData
  * @param {Wallet_Front_Mod_Notify} modNotify
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
@@ -22,6 +24,8 @@ const DOM_ID_UPLOAD = 'uploadFile';
 export default function (
     {
         Wallet_Front_Defaults$: DEF,
+        Wallet_Front_Util_Geo$: utilGeo,
+        Wallet_Front_Mod_App_Config$: modConfig,
         Wallet_Front_Mod_Data$: modData,
         Wallet_Front_Mod_Notify$: modNotify,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
@@ -32,50 +36,37 @@ export default function (
 <layout-main>
     <div class="q-pa-sm q-gutter-sm">
         <q-list bordered class="rounded-borders q-gutter-xs">
-            <q-expansion-item
-                    header-class="bg-primary text-white rounded-borders"
-                    expand-separator
-                    icon="dataset"
-                    label="Data" 
-            >
-                <q-card>
-                    <q-card-section class="q-gutter-xs">
-                        <div class="row justify-between items-center q-gutter-xs">
-                            <div>Data export</div>
-                            <div>
-                                <q-btn label="OK" color="primary" v-on:click="onDataExport"/>
-                            </div>
-                        </div>
-                        <div class="row justify-between items-center q-gutter-xs">
-                            <div>Data import</div>
-                            <div>
-                                <input id="${DOM_ID_UPLOAD}" type="file" tabindex="-1" hidden v-on:change="onUploadSelected" />
-                                <q-btn label="OK" color="primary" v-on:click="onDataImport"/>
-                            </div>
-                        </div>
-                    </q-card-section>
-                </q-card>
-            </q-expansion-item>
-            <q-expansion-item
-                    header-class="bg-primary text-white rounded-borders"
-                    expand-separator
-                    icon="settings_applications"
-                    label="Application" 
-            >
-                <q-card>
-                    <q-card-section class="q-gutter-xs">
-                        <div class="row justify-between items-center q-gutter-xs">
-                            <div>Re-Install</div>
-                            <div>
-                                <q-btn label="OK" color="primary" v-on:click="onAppReinstall"/>
-                            </div>
-                        </div>
-                    </q-card-section>
-                </q-card>
-            </q-expansion-item>
         </q-list>
+        <q-card>
+            <q-card-section class="q-gutter-xs">
+                <div class="row justify-between items-center q-gutter-xs">
+                    <div>Data export</div>
+                    <div>
+                        <q-btn label="OK" color="primary" v-on:click="onDataExport"/>
+                    </div>
+                </div>
+                <div class="row justify-between items-center q-gutter-xs">
+                    <div>Data import</div>
+                    <div>
+                        <input id="${DOM_ID_UPLOAD}" type="file" tabindex="-1" hidden v-on:change="onUploadSelected"/>
+                        <q-btn label="OK" color="primary" v-on:click="onDataImport"/>
+                    </div>
+                </div>
+                <div class="row justify-between items-center q-gutter-xs">
+                    <div>App Re-Install</div>
+                    <div>
+                        <q-btn label="OK" color="primary" v-on:click="onAppReinstall"/>
+                    </div>
+                </div>
+                <div class="row justify-between items-center q-gutter-xs" v-if="!ifGeoAllowed">
+                    <div>Geo Location</div>
+                    <div>
+                        <q-btn label="OK" color="primary" v-on:click="onGeoLocation"/>
+                    </div>
+                </div>
+            </q-card-section>
+        </q-card>
     </div>
-    <ui-spinner :loading="ifLoading"/>
 </layout-main>
 `;
 
@@ -94,7 +85,7 @@ export default function (
         data() {
             return {
                 bufferB64: null,
-                ifLoading: false,
+                ifGeoAllowed: false,
             };
         },
         computed: {},
@@ -127,6 +118,13 @@ export default function (
                 const elUpload = document.getElementById(DOM_ID_UPLOAD);
                 elUpload?.click();
             },
+            async onGeoLocation() {
+                const geo = await utilGeo.getCurrentPosition();
+                if (geo) {
+                    modConfig.setCanUseGeoApi(true);
+                    this.ifGeoAllowed = true;
+                }
+            },
             /**
              * Read uploaded file contents as Base64.
              * @param {Event} evt
@@ -152,6 +150,7 @@ export default function (
         },
         async mounted() {
             wgTitle.setTitle('Settings');
+            this.ifGeoAllowed = modConfig.getCanUseGeoApi();
         },
     };
 }

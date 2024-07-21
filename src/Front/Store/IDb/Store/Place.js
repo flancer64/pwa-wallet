@@ -13,7 +13,9 @@ const NAME = '/place';
 /**
  * @memberOf Wallet_Front_Store_IDb_Store_Place
  */
-const INDEX = {};
+const INDEX = {
+    BY_GEO: 'byGeo',
+};
 
 /**
  * @implements TeqFw_Web_Front_Api_Store_IEntity
@@ -47,7 +49,7 @@ export default class Wallet_Front_Store_IDb_Store_Place {
         this.getAttributes = () => ATTR;
 
         this.getKeysForIndex = function (index) {
-            // if (index === INDEX.BY_DATE_LAST) return [ATTR.DATE_LAST];
+            if (index === INDEX.BY_GEO) return [ATTR.LAT, ATTR.LNG];
             return this.getPrimaryKey();
         };
 

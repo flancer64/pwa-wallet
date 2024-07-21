@@ -15,6 +15,7 @@ const NS = 'Wallet_Front_Ui_Route_Card_Use';
  * @param {Wallet_Front_Util_Format} format
  * @param {Wallet_Front_Util_CodeType} codeType
  * @param {Wallet_Front_Mod_Card} modCard
+ * @param {Wallet_Front_Mod_Place} modPlace
  * @param {Wallet_Front_Ui_Widget_App_Title} wgTitle
  *
  * @returns {Wallet_Front_Ui_Route_Card_Use.vueCompTmpl}
@@ -25,6 +26,7 @@ export default function (
         Wallet_Front_Util_Format$: format,
         Wallet_Front_Util_CodeType$: codeType,
         Wallet_Front_Mod_Card$: modCard,
+        Wallet_Front_Mod_Place$: modPlace,
         Wallet_Front_Ui_Widget_App_Title$: wgTitle,
     }
 ) {
@@ -82,7 +84,7 @@ export default function (
         },
         computed: {
             uiDateCreated() {
-                return format.date(this.item.dateCreated);
+                return (this.item?.dateCreated) ? format.date(this.item.dateCreated) : null;
             },
         },
         methods: {
@@ -111,10 +113,16 @@ export default function (
                     this.ifNotFound = false;
                     this.item = found;
                     this.generateBarcode();
+                    await this.registerGeo();
                 } else {
                     this.ifNotFound = true;
                 }
                 this.ifLoading = false;
+            },
+            async registerGeo() {
+                const geo = await modPlace.getCurrentGeo();
+                await modPlace.registerUsage({geo});
+
             },
             async updateDateLast() {
                 const dto = modCard.composeEntity(this.item);

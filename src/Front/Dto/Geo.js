@@ -1,13 +1,12 @@
 /**
  * The geo coordinates data.
- * TODO: use it or remove
  */
 // MODULE'S VARS
-const NS = 'Wallet_Front_Dto_Mod_Geo';
+const NS = 'Wallet_Front_Dto_Geo';
 
 // MODULE'S CLASSES
 /**
- * @memberOf Wallet_Front_Dto_Mod_Geo
+ * @memberOf Wallet_Front_Dto_Geo
  */
 class Dto {
     static namespace = NS;
@@ -20,7 +19,7 @@ class Dto {
 /**
  * @implements TeqFw_Core_Shared_Api_Factory_Dto
  */
-export default class Wallet_Front_Dto_Mod_Geo {
+export default class Wallet_Front_Dto_Geo {
     /**
      * @param {TeqFw_Core_Shared_Util_Cast} cast
      */
@@ -30,8 +29,8 @@ export default class Wallet_Front_Dto_Mod_Geo {
         }
     ) {
         /**
-         * @param {Wallet_Front_Dto_Mod_Geo.Dto} [data]
-         * @return {Wallet_Front_Dto_Mod_Geo.Dto}
+         * @param {Wallet_Front_Dto_Geo.Dto} [data]
+         * @return {Wallet_Front_Dto_Geo.Dto}
          */
         this.createDto = function (data) {
             // create new DTO

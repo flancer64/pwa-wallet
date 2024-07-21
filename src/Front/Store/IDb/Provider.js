@@ -3,7 +3,7 @@
  */
 // MODULE'S VARS
 const NS = 'Wallet_Front_Store_IDb_Provider';
-const IDB_VERSION = 2;
+const IDB_VERSION = 3;
 
 /**
  * Factory to create connector to application level IDB.
@@ -62,7 +62,8 @@ export default function (
                 db.deleteObjectStore(PLACE_NAME);
             }
             const store = db.createObjectStore(PLACE_NAME, {keyPath: PLACE_PK[0]});
-            //store.createIndex(CARD_INDEX.BY_DATE_LAST, CARD_ATTRS.DATE_LAST, {unique: false});
+            const byGeo = PLACE_INDEX.BY_GEO;
+            store.createIndex(byGeo, idbPlace.getKeysForIndex(byGeo), {unique});
         }
     }
 

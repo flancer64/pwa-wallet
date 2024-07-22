@@ -80,7 +80,7 @@ export default function (
             };
         },
         props: {
-            uuid: String,
+            id: String,
         },
         computed: {
             uiDateCreated() {
@@ -108,8 +108,8 @@ export default function (
             },
             async loadItem() {
                 this.ifLoading = true;
-                const found = await modCard.readOne({uuid: this.uuid});
-                if (found?.uuid) {
+                const found = await modCard.readOne({id: Number.parseInt(this.id)});
+                if (found?.id) {
                     this.ifNotFound = false;
                     this.item = found;
                     this.generateBarcode();
@@ -120,8 +120,10 @@ export default function (
                 this.ifLoading = false;
             },
             async registerGeo() {
+                debugger
+                const cardRef = this.item.id;
                 const geo = await modPlace.getCurrentGeo();
-                await modPlace.registerUsage({geo});
+                await modPlace.registerUsage({geo, cardRef});
 
             },
             async updateDateLast() {

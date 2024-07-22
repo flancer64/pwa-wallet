@@ -6,6 +6,8 @@ export default class Wallet_Front_Mod_Place {
      * @param {Wallet_Front_Util_Geo} utilGeo
      * @param {TeqFw_Web_Front_App_Store_IDB} idb
      * @param {Wallet_Front_Store_IDb_Store_Place} idbPlace
+     * @param {Wallet_Front_Store_IDb_Store_Place_Ref_Card} idbRefCard
+     * @param {Wallet_Front_Mod_Notify} modNotify
      * @param {Wallet_Front_Mod_App_Config} modConfig
      */
     constructor(
@@ -13,6 +15,8 @@ export default class Wallet_Front_Mod_Place {
             Wallet_Front_Util_Geo$: utilGeo,
             Wallet_Front_Store_IDb_Provider$: idb,
             Wallet_Front_Store_IDb_Store_Place$: idbPlace,
+            Wallet_Front_Store_IDb_Store_Place_Ref_Card$: idbRefCard,
+            Wallet_Front_Mod_Notify$: modNotify,
             Wallet_Front_Mod_App_Config$: modConfig,
         }
     ) {
@@ -36,7 +40,7 @@ export default class Wallet_Front_Mod_Place {
          */
         this.create = async function (dto) {
             const trx = await idb.startTransaction([idbPlace]);
-            dto.uuid = self.crypto.randomUUID();
+            dto.id = self.crypto.randomUUID();
             const key = await idb.create(trx, idbPlace, dto);
             const res = await idb.readOne(trx, idbPlace, key);
             await trx.commit();
@@ -50,7 +54,7 @@ export default class Wallet_Front_Mod_Place {
          */
         this.deleteOne = async function (dto) {
             const trx = await idb.startTransaction([idbPlace]);
-            const res = await idb.deleteOne(trx, idbPlace, dto.uuid);
+            const res = await idb.deleteOne(trx, idbPlace, dto.id);
             await trx.commit();
             return res;
         };
@@ -78,24 +82,68 @@ export default class Wallet_Front_Mod_Place {
         };
 
         /**
+         * Register new place and card usage.
          * @param {Wallet_Front_Dto_Geo.Dto} geo
+         * @param {number} [cardRef]
          * @return {Promise<*[]>}
          */
-        this.registerUsage = async function ({geo}) {
-            const trx = await idb.startTransaction([idbPlace]);
-            const key = [geo.lat, geo.lng];
-            const found = await idb.readOne(trx, idbPlace, key, INDEX.BY_GEO);
-            if (!found) {
-                const dto = this.composeEntity();
-                dto.lat = geo.lat;
-                dto.lng = geo.lng;
-                dto.uuid = self.crypto.randomUUID();
-                const key = await idb.create(trx, idbPlace, dto);
-            } else {
-                found.count = found.count ? found.count + 1 : 1;
-                await idb.updateOne(trx, idbPlace, found);
+        this.registerUsage = async function ({geo, cardRef}) {
+            // FUNCS
+            /**
+             * Create new or found existing place for given geo coordinates.
+             * @param {IDBTransaction} trx
+             * @param {Wallet_Front_Dto_Place.Dto} place
+             * @param {number} cardRef
+             * @return {Promise<Wallet_Front_Store_IDb_Store_Place_Ref_Card.Dto>}
+             */
+            async function countCardUsage(trx, place, cardRef) {
+                const searchKey = [place.id, cardRef];
+                /** @type {Wallet_Front_Store_IDb_Store_Place_Ref_Card.Dto} */
+                const found = await idb.readOne(trx, idbRefCard, searchKey);
+                if (!found) {
+                    const dto = idbRefCard.createDto();
+                    dto.cardRef = cardRef;
+                    dto.placeRef = place.id;
+                    dto.usages = 1;
+                    const pk = await idb.create(trx, idbRefCard, dto);
+                    return await idb.readOne(trx, idbRefCard, pk);
+                } else {
+                    found.usages++;
+                    await idb.updateOne(trx, idbRefCard, found);
+                    return await idb.readOne(trx, idbRefCard, searchKey);
+                }
             }
-            await trx.commit();
+
+            /**
+             * Create new or found existing place for given geo coordinates.
+             * @param {IDBTransaction} trx
+             * @param {Wallet_Front_Dto_Geo.Dto} geo
+             * @return {Promise<Wallet_Front_Dto_Place.Dto>}
+             */
+            async function findPlace(trx, geo) {
+                const key = [geo.lat, geo.lng];
+                const found = await idb.readOne(trx, idbPlace, key, INDEX.BY_GEO);
+                if (!found) {
+                    const dto = idbPlace.createDto();
+                    dto.lat = geo.lat;
+                    dto.lng = geo.lng;
+                    const key = await idb.create(trx, idbPlace, dto);
+                    return await idb.readOne(trx, idbPlace, key);
+                } else {
+                    return found;
+                }
+            }
+
+            // MAIN
+            const trx = await idb.startTransaction([idbPlace, idbRefCard]);
+            try {
+                const place = await findPlace(trx, geo);
+                await countCardUsage(trx, place, cardRef);
+                await trx.commit();
+            } catch (e) {
+                await trx.abort();
+                modNotify.negative(e.message);
+            }
         };
 
         /**

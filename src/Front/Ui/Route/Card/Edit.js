@@ -127,7 +127,7 @@ export default function (
             };
         },
         props: {
-            uuid: String,
+            id: String,
         },
         computed: {
             cssColor() {
@@ -153,8 +153,8 @@ export default function (
             },
             async loadItem() {
                 this.ifLoading = true;
-                const found = await modCard.readOne({uuid: this.uuid});
-                if (found?.uuid) {
+                const found = await modCard.readOne({id: Number.parseInt(this.id)});
+                if (found?.id) {
                     this.ifNotFound = false;
                     this.reset(found);
                 } else {
@@ -173,7 +173,7 @@ export default function (
                 if (this.fldDesc) dto.desc = String(this.fldDesc);
                 if (this.fldColor) dto.color = String(this.fldColor);
                 const updated = await modCard.updateOne(dto);
-                if (updated.uuid) {
+                if (updated.id) {
                     modNotify.positive(`The card has been saved to IDB.`);
                     this.$router.push(DEF.ROUTE_CARD_LIST);
                 } else {

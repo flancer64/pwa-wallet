@@ -13,7 +13,7 @@ export default class Wallet_Front_Mod_Card {
         }
     ) {
         // VARS
-        const CARD_INDEX = idbCard.getIndexes();
+        const INDEX = idbCard.getIndexes();
 
         // FUNCS
 
@@ -31,7 +31,7 @@ export default class Wallet_Front_Mod_Card {
         this.create = async function (dto) {
             const trx = await idb.startTransaction([idbCard]);
             dto.dateCreated = new Date();
-            dto.uuid = self.crypto.randomUUID();
+            dto.id = self.crypto.randomUUID();
             const key = await idb.create(trx, idbCard, dto);
             const res = await idb.readOne(trx, idbCard, key);
             await trx.commit();
@@ -45,7 +45,7 @@ export default class Wallet_Front_Mod_Card {
          */
         this.deleteOne = async function (dto) {
             const trx = await idb.startTransaction([idbCard]);
-            const res = await idb.deleteOne(trx, idbCard, dto.uuid);
+            const res = await idb.deleteOne(trx, idbCard, dto.id);
             await trx.commit();
             return res;
         };
@@ -63,11 +63,12 @@ export default class Wallet_Front_Mod_Card {
 
         /**
          * Read one card from IDB.
+         * @param {number} id
          * @returns {Promise<Wallet_Front_Dto_Card.Dto>}
          */
-        this.readOne = async function ({uuid}) {
+        this.readOne = async function ({id}) {
             const trx = await idb.startTransaction([idbCard]);
-            const res = await idb.readOne(trx, idbCard, uuid);
+            const res = await idb.readOne(trx, idbCard, id);
             await trx.commit();
             return res;
         };

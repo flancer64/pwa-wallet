@@ -83,12 +83,12 @@ export default function (
         methods: {
             onEdit() {
                 const path = DEF.ROUTE_CARD_EDIT_X
-                    .replace(':uuid', this.item.uuid);
+                    .replace(':id', this.item.id);
                 this.$router.push(path);
             },
             onUse() {
                 const path = DEF.ROUTE_CARD_USE_X
-                    .replace(':uuid', this.item.uuid);
+                    .replace(':id', this.item.id);
                 this.$router.push(path);
             },
         },

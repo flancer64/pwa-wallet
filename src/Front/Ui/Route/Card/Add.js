@@ -136,7 +136,7 @@ export default function (
                 if (this.fldColor) dto.color = String(this.fldColor);
                 if(this.fldDesc) dto.desc = String(this.fldDesc);
                 const created = await modCard.create(dto);
-                if (created.uuid) {
+                if (created.id) {
                     modNotify.positive(`New card is added to IDB.`);
                     this.$router.push(DEF.ROUTE_CARD_LIST);
                 } else {

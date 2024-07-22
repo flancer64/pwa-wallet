@@ -3,7 +3,7 @@
  */
 // MODULE'S VARS
 const NS = 'Wallet_Front_Store_IDb_Provider';
-const IDB_VERSION = 3;
+const IDB_VERSION = 5;
 
 /**
  * Factory to create connector to application level IDB.
@@ -11,6 +11,7 @@ const IDB_VERSION = 3;
  * @param {TeqFw_Web_Front_App_Store_IDB} idb -  new instance
  * @param {Wallet_Front_Store_IDb_Store_Card} idbCard
  * @param {Wallet_Front_Store_IDb_Store_Place} idbPlace
+ * @param {Wallet_Front_Store_IDb_Store_Place_Ref_Card} idbPlaceRefCard
  * @param {typeof Wallet_Front_Enum_Code_Type} TYPE
  *
  * @return {TeqFw_Web_Front_App_Store_IDB}
@@ -20,6 +21,7 @@ export default function (
         TeqFw_Web_Front_App_Store_IDB$$: idb,
         Wallet_Front_Store_IDb_Store_Card$: idbCard,
         Wallet_Front_Store_IDb_Store_Place$: idbPlace,
+        Wallet_Front_Store_IDb_Store_Place_Ref_Card$: idbPlaceRefCard,
         Wallet_Front_Enum_Code_Type$: TYPE,
     }
 ) {
@@ -32,6 +34,10 @@ export default function (
     const PLACE_INDEX = idbPlace.getIndexes();
     const PLACE_NAME = idbPlace.getName();
     const PLACE_PK = idbPlace.getPrimaryKey();
+    const PLACE_REF_CARD_ATTRS = idbPlaceRefCard.getAttributes();
+    const PLACE_REF_CARD_INDEX = idbPlaceRefCard.getIndexes();
+    const PLACE_REF_CARD_NAME = idbPlaceRefCard.getName();
+    const PLACE_REF_CARD_PK = idbPlaceRefCard.getPrimaryKey();
 
     // FUNCS
     /**
@@ -52,7 +58,7 @@ export default function (
                 // TODO: we need none-destructive method to re-create structure of the store
                 db.deleteObjectStore(CARD_NAME);
             }
-            const store = db.createObjectStore(CARD_NAME, {keyPath: CARD_PK[0]});
+            const store = db.createObjectStore(CARD_NAME, {keyPath: CARD_PK[0], autoIncrement});
             store.createIndex(CARD_INDEX.BY_DATE_LAST, CARD_ATTRS.DATE_LAST, {unique: false});
         }
         // /place
@@ -61,9 +67,19 @@ export default function (
                 // TODO: we need none-destructive method to re-create structure of the store
                 db.deleteObjectStore(PLACE_NAME);
             }
-            const store = db.createObjectStore(PLACE_NAME, {keyPath: PLACE_PK[0]});
+            const store = db.createObjectStore(PLACE_NAME, {keyPath: PLACE_PK[0], autoIncrement});
             const byGeo = PLACE_INDEX.BY_GEO;
             store.createIndex(byGeo, idbPlace.getKeysForIndex(byGeo), {unique});
+        }
+        // /place/ref/card
+        {
+            if (db.objectStoreNames.contains(PLACE_REF_CARD_NAME)) {
+                // TODO: we need none-destructive method to re-create structure of the store
+                db.deleteObjectStore(PLACE_REF_CARD_NAME);
+            }
+            const keyPath = idbPlaceRefCard.getPrimaryKey();
+            const store = db.createObjectStore(PLACE_REF_CARD_NAME, {keyPath});
+            // store.createIndex(byRefs, idbPlaceRefCard.getKeysForIndex(byRefs), {unique});
         }
     }
 

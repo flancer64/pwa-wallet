@@ -59,7 +59,7 @@ export default class Wallet_Front_Store_IDb_Store_Card {
          */
         this.getIndexes = () => INDEX;
 
-        this.getPrimaryKey = () => [ATTR.UUID];
+        this.getPrimaryKey = () => [ATTR.ID];
     }
 
 

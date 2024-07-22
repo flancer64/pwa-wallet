@@ -15,8 +15,8 @@ const ATTR = {
     DATE_CREATED: 'dateCreated',
     DATE_LAST: 'dateLast',
     DESC: 'desc',
+    ID: 'id',
     NAME: 'name',
-    UUID: 'uuid',
 };
 
 // MODULE'S CLASSES
@@ -57,15 +57,15 @@ class Dto {
      */
     desc;
     /**
+     * Integer Identifier.
+     * @type {number}
+     */
+    id;
+    /**
      * The name of the card.
      * @type {string}
      */
     name;
-    /**
-     * Universally Unique Identifier.
-     * @type {string}
-     */
-    uuid;
 }
 
 /**
@@ -97,8 +97,8 @@ export default class Wallet_Front_Dto_Card {
             res.dateCreated = cast.date(data?.dateCreated);
             res.dateLast = cast.date(data?.dateLast);
             res.desc = cast.string(data?.desc);
+            res.id = cast.int(data?.id);
             res.name = cast.string(data?.name);
-            res.uuid = cast.string(data?.uuid);
             return res;
         };
 

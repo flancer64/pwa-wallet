@@ -8,9 +8,9 @@ export default class Wallet_Front_Defaults {
     ROUTE_APP_IMPORT = '/app/import';
     ROUTE_APP_UPGRADE = '/app/upgrade';
     ROUTE_CARD_ADD = '/card/add';
-    ROUTE_CARD_EDIT_X = '/card/edit/:uuid';
+    ROUTE_CARD_EDIT_X = '/card/edit/:id';
     ROUTE_CARD_LIST = '/card/list';
-    ROUTE_CARD_USE_X = '/card/use/:uuid';
+    ROUTE_CARD_USE_X = '/card/use/:id';
     ROUTE_HOME = '/';
     ROUTE_PLACE_LIST = '/place/list';
     ROUTE_SETTINGS = '/settings';

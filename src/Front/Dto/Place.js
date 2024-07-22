@@ -9,9 +9,9 @@ const NS = 'Wallet_Front_Dto_Place';
  * @type {Object}
  */
 const ATTR = {
+    ID: 'id',
     LAT: 'lat',
     LNG: 'lng',
-    UUID: 'uuid',
 };
 
 // MODULE'S CLASSES
@@ -20,15 +20,14 @@ const ATTR = {
  */
 class Dto {
     static namespace = NS;
+    /**
+     * @type {number}
+     */
+    id;
     /** @type {number} */
     lat;
     /** @type {number} */
     lng;
-    /**
-     * Universally Unique Identifier.
-     * @type {string}
-     */
-    uuid;
 }
 
 /**
@@ -52,9 +51,9 @@ export default class Wallet_Front_Dto_Place {
             // create new DTO and populate it with initialization data
             const res = Object.assign(new Dto(), data);
             // cast known attributes
+            res.id = cast.int(data?.id);
             res.lat = cast.decimal(data?.lat);
             res.lng = cast.decimal(data?.lng);
-            res.uuid = cast.string(data?.uuid);
             return res;
         };
 

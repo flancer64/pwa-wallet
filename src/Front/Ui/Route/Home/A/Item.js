@@ -1,10 +1,10 @@
 /**
  * The Vue component to display one card in the cards list.
  *
- * @namespace Wallet_Front_Ui_Route_Card_List_A_Item
+ * @namespace Wallet_Front_Ui_Route_Home_A_Item
  */
 // MODULE'S VARS
-const NS = 'Wallet_Front_Ui_Route_Card_List_A_Item';
+const NS = 'Wallet_Front_Ui_Route_Home_A_Item';
 
 // MODULE'S FUNCTIONS
 
@@ -14,7 +14,7 @@ const NS = 'Wallet_Front_Ui_Route_Card_List_A_Item';
  * @param {Wallet_Front_Defaults} DEF
  * @param {Wallet_Front_Util_Format} format
  *
- * @returns {Wallet_Front_Ui_Route_Card_List_A_Item.vueCompTmpl}
+ * @returns {Wallet_Front_Ui_Route_Home_A_Item.vueCompTmpl}
  */
 export default function (
     {
@@ -52,7 +52,7 @@ export default function (
      * Template to create new component instances using Vue.
      *
      * @const {Object} vueCompTmpl
-     * @memberOf Wallet_Front_Ui_Route_Card_List_A_Item
+     * @memberOf Wallet_Front_Ui_Route_Home_A_Item
      */
     return {
         teq: {

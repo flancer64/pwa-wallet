@@ -23,7 +23,6 @@ export default class Wallet_Front_Mod_Place {
         // VARS
         const ATTR = idbPlace.getAttributes();
         const INDEX = idbPlace.getIndexes();
-        const POS_ACCURACY_METERS = 10;
 
         // FUNCS
 
@@ -40,7 +39,6 @@ export default class Wallet_Front_Mod_Place {
          */
         this.create = async function (dto) {
             const trx = await idb.startTransaction([idbPlace]);
-            dto.id = self.crypto.randomUUID();
             const key = await idb.create(trx, idbPlace, dto);
             const res = await idb.readOne(trx, idbPlace, key);
             await trx.commit();
@@ -64,8 +62,7 @@ export default class Wallet_Front_Mod_Place {
          */
         this.getCurrentGeo = async function () {
             if (modConfig.getCanUseGeoApi()) {
-                const pos = await utilGeo.getCurrentPosition();
-                return utilGeo.roundPosition(pos, POS_ACCURACY_METERS);
+                return utilGeo.getCurrentPosition();
             }
             return undefined;
         };

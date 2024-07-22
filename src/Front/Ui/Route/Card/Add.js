@@ -138,7 +138,7 @@ export default function (
                 const created = await modCard.create(dto);
                 if (created.id) {
                     modNotify.positive(`New card is added to IDB.`);
-                    this.$router.push(DEF.ROUTE_CARD_LIST);
+                    this.$router.push(DEF.ROUTE_HOME);
                 } else {
                     modNotify.negative(`Cannot add new card to IDB.`);
                 }

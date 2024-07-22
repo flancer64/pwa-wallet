@@ -146,7 +146,7 @@ export default function (
                 const deleted = await modCard.deleteOne(this.origin);
                 if (deleted) {
                     modNotify.positive(`The card has been deleted.`);
-                    this.$router.push(DEF.ROUTE_CARD_LIST);
+                    this.$router.push(DEF.ROUTE_HOME);
                 } else {
                     modNotify.negative(`Failed to delete the card from IDB.`);
                 }
@@ -175,7 +175,7 @@ export default function (
                 const updated = await modCard.updateOne(dto);
                 if (updated.id) {
                     modNotify.positive(`The card has been saved to IDB.`);
-                    this.$router.push(DEF.ROUTE_CARD_LIST);
+                    this.$router.push(DEF.ROUTE_HOME);
                 } else {
                     modNotify.negative(`Failed to save the card to IDB.`);
                 }

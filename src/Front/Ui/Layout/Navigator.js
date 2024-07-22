@@ -72,10 +72,6 @@ export default function (
                         label: 'Add',
                         route: DEF.ROUTE_CARD_ADD,
                     }, {
-                        icon: 'list',
-                        label: 'List',
-                        route: DEF.ROUTE_CARD_LIST,
-                    }, {
                         icon: 'settings',
                         label: 'Settings',
                         route: DEF.ROUTE_SETTINGS,

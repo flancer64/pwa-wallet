@@ -120,10 +120,9 @@ export default function (
                 this.ifLoading = false;
             },
             async registerGeo() {
-                debugger
                 const cardRef = this.item.id;
                 const geo = await modPlace.getCurrentGeo();
-                await modPlace.registerUsage({geo, cardRef});
+                if (geo) await modPlace.registerUsage({geo, cardRef});
 
             },
             async updateDateLast() {

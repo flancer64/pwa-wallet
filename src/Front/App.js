@@ -99,6 +99,10 @@ export default class Wallet_Front_App {
                 });
                 // setup application routes (load es6-module on demand using DI-container)
                 router.addRoute({
+                    path: DEF.ROUTE_ABOUT,
+                    component: lazyRoute('Wallet_Front_Ui_Route_About'),
+                });
+                router.addRoute({
                     path: DEF.ROUTE_CARD_ADD,
                     component: lazyRoute('Wallet_Front_Ui_Route_Card_Add'),
                 });

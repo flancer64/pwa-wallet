@@ -32,7 +32,6 @@ cd "${DIR_ROOT}" || exit 255
 npm install --omit=optional
 
 echo "Clone dependencies from github to inner folders."
-mkdir -p "${DIR_OWN}/@ranncow/"
 mkdir -p "${DIR_OWN}/@teqfw/"
 
 processRepo "teqfw/core"
